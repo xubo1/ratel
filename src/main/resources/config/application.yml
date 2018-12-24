@@ -4,8 +4,8 @@
 #======================================#
 
 # 产品或项目名称、软件开发公司名称
-productName: ratel
-companyName: ChinaNet Ideal
+productName: 安全监测监管平台
+companyName: 中国电信上海理想信息产业（集团）有限公司
 
 # 产品版本、版权年份
 productVersion: V4.1
@@ -419,15 +419,15 @@ logging:
 #      mappingPath: mappings
   
 # Web 相关
-#web:
+web:
 #  
 #  # MVC 视图相关
-#  view:
+  view:
 #    
 #    # 系统主题名称，主题视图优先级最高，如果主题下无这个视图文件则访问默认视图
 #    # 引入页面头部：'/themes/'+themeName+'/include/header.html'
 #    # 引入页面尾部：'/themes/'+themeName+'/include/footer.html'
-#    themeName: default
+    themeName: default
 #
 #  # MVC 拦截器
 #  interceptor:
