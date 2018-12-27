@@ -145,7 +145,14 @@ spring:
   # 打印横幅
   main:
     bannerMode: "off"
-    
+  #Kafka相关
+  # 指定kafka 代理地址，可以多个
+  kafka:
+    bootstrap-servers: 101.89.134.130:9092
+  app:
+    topic:
+      foo: foo.t
+
 #  # Redis 连接参数 （RedisProperties）
 #  redis:
 #    host: 127.0.0.1
