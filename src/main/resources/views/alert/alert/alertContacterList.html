@@ -1,0 +1,95 @@
+<% layout('/layouts/default.html', {title: 'contactor管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text('contactor管理')}
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<% if(hasPermi('alert:alertContacter:edit')){ %>
+					<a href="${ctx}/alert/alertContacter/form" class="btn btn-default btnTool" title="${text('新增contactor')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${alertContacter}" action="${ctx}/alert/alertContacter/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">${text('姓名')}：</label>
+					<div class="control-inline">
+						<#form:input path="name" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('手机号码')}：</label>
+					<div class="control-inline">
+						<#form:input path="mobile" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('启用短信告警')}：</label>
+					<div class="control-inline width-120">
+						<#form:select path="mobileSelected" dictType="sys_yes_no" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('电子邮箱')}：</label>
+					<div class="control-inline">
+						<#form:input path="email" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('启用邮件告警')}：</label>
+					<div class="control-inline width-120">
+						<#form:select path="emailSelected" dictType="sys_yes_no" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("姓名")}', name:'name', index:'a.name', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/alert/alertContacter/form?id='+row.id+'" class="btnList" data-title="${text("编辑contactor")}">'+(val||row.id)+'</a>';
+		}},
+		{header:'${text("手机号码")}', name:'mobile', index:'a.mobile', width:150, align:"left"},
+		{header:'${text("启用短信告警")}', name:'mobileSelected', index:'a.mobile_selected', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('sys_yes_no')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("电子邮箱")}', name:'email', index:'a.email', width:150, align:"left"},
+		{header:'${text("启用邮件告警")}', name:'emailSelected', index:'a.email_selected', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('sys_yes_no')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("操作")}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('alert:alertContacter:edit')){ %>
+				actions.push('<a href="${ctx}/alert/alertContacter/form?id='+row.id+'" class="btnList" title="${text("编辑contactor")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				if (row.status == Global.STATUS_NORMAL){
+					actions.push('<a href="${ctx}/alert/alertContacter/disable?id='+row.id+'" class="btnList" title="${text("停用contactor")}" data-confirm="${text("确认要停用该contactor吗？")}"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
+				}
+				if (row.status == Global.STATUS_DISABLE){
+					actions.push('<a href="${ctx}/alert/alertContacter/enable?id='+row.id+'" class="btnList" title="${text("启用contactor")}" data-confirm="${text("确认要启用该contactor吗？")}"><i class="glyphicon glyphicon-ok-circle"></i></a>&nbsp;');
+				}
+				actions.push('<a href="${ctx}/alert/alertContacter/delete?id='+row.id+'" class="btnList" title="${text("删除contactor")}" data-confirm="${text("确认要删除该contactor吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

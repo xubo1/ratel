@@ -1,0 +1,107 @@
+<% layout('/layouts/default.html', {title: 'test_trigger管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text('test_trigger管理')}
+			</div>
+			<div class="box-tools pull-right">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<% if(hasPermi('trigger:testTrigger:edit')){ %>
+					<a href="${ctx}/trigger/testTrigger/form" class="btn btn-default btnTool" title="${text('新增test_trigger')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${testTrigger}" action="${ctx}/trigger/testTrigger/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">${text('expression')}：</label>
+					<div class="control-inline">
+						<#form:input path="表达式" maxlength="2048" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('description')}：</label>
+					<div class="control-inline">
+						<#form:input path="描述" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('thestatus')}：</label>
+					<div class="control-inline">
+						<#form:input path="启用" maxlength="11" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('value')}：</label>
+					<div class="control-inline">
+						<#form:input path="告警状态" maxlength="11" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('priority')}：</label>
+					<div class="control-inline width-120">
+						<#form:select path="严重等级" dictType="triger_priority" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('lastchange')}：</label>
+					<div class="control-inline">
+						<#form:input path="最后状态改变时间" maxlength="11" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('error')}：</label>
+					<div class="control-inline">
+						<#form:input path="错误" maxlength="128" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("expression")}', name:'表达式', index:'a.expression', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '<a href="${ctx}/trigger/testTrigger/form?触发器id='+row.触发器id+'" class="btnList" data-title="${text("编辑test_trigger")}">'+(val||row.id)+'</a>';
+		}},
+		{header:'${text("description")}', name:'描述', index:'a.description', width:150, align:"left"},
+		{header:'${text("thestatus")}', name:'启用', index:'a.thestatus', width:150, align:"center"},
+		{header:'${text("value")}', name:'告警状态', index:'a.value', width:150, align:"center"},
+		{header:'${text("priority")}', name:'严重等级', index:'a.priority', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('triger_priority')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("lastchange")}', name:'最后状态改变时间', index:'a.lastchange', width:150, align:"center"},
+		{header:'${text("error")}', name:'错误', index:'a.error', width:150, align:"left"},
+		{header:'${text("操作")}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('trigger:testTrigger:edit')){ %>
+				actions.push('<a href="${ctx}/trigger/testTrigger/form?触发器id='+row.触发器id+'" class="btnList" title="${text("编辑test_trigger")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				if (row.status == Global.STATUS_NORMAL){
+					actions.push('<a href="${ctx}/trigger/testTrigger/disable?触发器id='+row.触发器id+'" class="btnList" title="${text("停用test_trigger")}" data-confirm="${text("确认要停用该test_trigger吗？")}"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
+				}
+				if (row.status == Global.STATUS_DISABLE){
+					actions.push('<a href="${ctx}/trigger/testTrigger/enable?触发器id='+row.触发器id+'" class="btnList" title="${text("启用test_trigger")}" data-confirm="${text("确认要启用该test_trigger吗？")}"><i class="glyphicon glyphicon-ok-circle"></i></a>&nbsp;');
+				}
+				actions.push('<a href="${ctx}/trigger/testTrigger/delete?触发器id='+row.触发器id+'" class="btnList" title="${text("删除test_trigger")}" data-confirm="${text("确认要删除该test_trigger吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>
