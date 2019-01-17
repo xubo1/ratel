@@ -38,6 +38,7 @@ public class DetailController {
         object.put("danger",17);
         object.put("average",14);
         object.put("low",15);
+        object.put("url","http://woyaosile.com");
         return object;
     }
 
